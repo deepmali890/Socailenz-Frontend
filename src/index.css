@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* global.css or tailwind.css */
+[data-sonner-toast] {
+  background-color: white !important;
+  color: black !important;
+}
