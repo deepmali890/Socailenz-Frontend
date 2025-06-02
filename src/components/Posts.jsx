@@ -1,14 +1,27 @@
-import React from 'react'
-import Post from './Post'
+// src/components/Posts.jsx
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchPosts } from '@/redux/slice/PostSlice';
+import Post from './Post';
 
 const Posts = () => {
-  return (
-    <div className='mx-auto'>
-      {
-        [1,2,3,4,5,6].map((item,index)=> <Post key={index}/>)
-      }
-    </div>
-  )
-}
+  const dispatch = useDispatch();
+  const { posts, loading, error } = useSelector((state) => state.post);
 
-export default Posts
+  useEffect(() => {
+    dispatch(fetchPosts());
+  }, [dispatch]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
+  return (
+    <div className="mx-auto">
+      {posts.map((post) => (
+        <Post key={post._id} post={post} />
+      ))}
+    </div>
+  );
+};
+
+export default Posts;

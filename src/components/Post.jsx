@@ -5,17 +5,17 @@ import { Button } from './ui/button'
 import { DialogContent } from './ui/dialog'
 import CommentModel from './CommentModel'
 
-const Post = () => {
+const Post = ({ post }) => {
 
     const [showComments, setShowComments] = useState(false);
     const [text, setText] = useState('');
 
-    const changeCommentEventHandler = (e) =>{
+    const changeCommentEventHandler = (e) => {
 
         const inputText = e.target.value;
-        if(inputText.trim()){
+        if (inputText.trim()) {
             setText(inputText)
-        }else{
+        } else {
             setText('')
         }
 
@@ -27,13 +27,13 @@ const Post = () => {
                 {/* Header */}
                 <div className="flex items-center gap-3 px-4 py-3">
                     <img
-                        src="/public/WhatsApp Image 2025-05-08 at 10.55.30_93410640.jpg" // Replace with profile pic
+                        src={post.author.profilePicture} // Replace with profile pic
                         alt="user"
                         className="w-10 h-10 rounded-full"
                     />
                     <div className="flex-1">
-                        <p className="text-sm font-semibold">radhakrishnadivine_ <span className="text-blue-500">✔</span></p>
-                        <p className="text-xs text-neutral-400">Vrindavan - वृंदावन, UP, India</p>
+                        <p className="text-sm font-semibold">{post.author.username}<span className="text-blue-500"></span></p>
+                        <p className="text-xs text-neutral-400">{post.location}</p>
                     </div>
                     <div className="text-neutral-400 text-lg">
                         <Dialog>
@@ -56,13 +56,15 @@ const Post = () => {
                     </div>
                 </div>
 
-                {/* Image */}
-                <div>
-                    <img
-                        src="/public/WhatsApp Image 2025-05-08 at 10.55.30_93410640.jpg"
-                        alt="post"
-                        className="w-full object-cover"
-                    />
+                <div className="grid grid-cols-2 gap-4">
+                    {post.images.map((imageUrl, index) => (
+                        <img
+                            key={index}
+                            src={imageUrl}
+                            alt={`post-${index}`}
+                            className="w-full object-cover rounded"
+                        />
+                    ))}
                 </div>
 
                 {/* Action Buttons */}
@@ -76,11 +78,11 @@ const Post = () => {
                 </div>
 
                 {/* Likes */}
-                <div className="px-4 text-sm font-medium">8,292 likes</div>
+                <div className="px-4 text-sm font-medium">{post.likes.length} likes</div>
 
                 {/* Caption */}
                 <div className="px-4 py-2 text-sm">
-                    <span className="font-semibold">radhakrishnadivine_</span>{" "}
+                    <span className="font-semibold">{post.caption}</span>{" "}
                     <span>🔥👊❤️</span>
                 </div>
 
@@ -88,7 +90,7 @@ const Post = () => {
                 <div className="px-4 text-sm text-neutral-400 mb-2 cursor-pointer"
                     onClick={() => setShowComments(true)}
                 >
-                    View all 57 comments
+                    View all {post.comments.length} comments
                 </div>
 
                 {/* Add Comment */}
@@ -101,9 +103,9 @@ const Post = () => {
                         className="w-full bg-transparent border-none outline-none text-sm text-white placeholder-neutral-500"
                     />
                     {
-                        text &&  <span className='text-blue-500 cursor-pointer'>Post</span>
+                        text && <span className='text-blue-500 cursor-pointer'>Post</span>
                     }
-                   
+
                 </div>
             </div>
             {showComments && <CommentModel onClose={() => setShowComments(false)} />}

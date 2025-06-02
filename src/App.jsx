@@ -10,7 +10,9 @@ import EditProfile from "./components/EditProfile";
 import ArchivePosts from "./components/ArchivePosts";
 import SearchPage from "./components/SearchPage";
 import ExpolorePage from "./components/ExpolorePage";
-import PrivateRoute from "./PrivateRoute";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
 
 
 const router = createBrowserRouter([
@@ -20,59 +22,31 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: (
-          <PrivateRoute>
-            <Home />
-          </PrivateRoute>
-        ),
+        element: <Home />,
       },
       {
         path: "/profile",
-        element: (
-          <PrivateRoute>
-            <MyProfile />
-          </PrivateRoute>
-        ),
+        element: <MyProfile />,
       },
       {
         path: "/notification",
-        element: (
-          <PrivateRoute>
-            <Notifications />
-          </PrivateRoute>
-        ),
+        element: <Notifications />,
       },
       {
         path: "/editprofile",
-        element: (
-          <PrivateRoute>
-            <EditProfile />
-          </PrivateRoute>
-        ),
+        element: <EditProfile />,
       },
       {
         path: "/archive",
-        element: (
-          <PrivateRoute>
-            <ArchivePosts />
-          </PrivateRoute>
-        ),
+        element: <ArchivePosts />,
       },
       {
         path: "/search",
-        element: (
-          <PrivateRoute>
-            <SearchPage />
-          </PrivateRoute>
-        ),
+        element: <SearchPage />,
       },
-      {
+       {
         path: "/expolre",
-        element: (
-          <PrivateRoute>
-            <ExpolorePage />
-          </PrivateRoute>
-        ),
+        element: <ExpolorePage />,
       },
     ],
   },
@@ -84,6 +58,7 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <SignUp />,
   },
+
 ]);
 
 function App() {

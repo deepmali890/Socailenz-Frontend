@@ -7,52 +7,21 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuthUser } from '@/redux/slice/auth.slice';
-import {
-  Dialog, DialogContent, DialogHeader,
-  DialogTitle, DialogDescription
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import CreatePost from './CreatePost';
+import { motion } from 'framer-motion';
+
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  
   const { user } = useSelector(state => state.auth);
   const dispatch = useDispatch();
-  const [open, setOpen] = useState(false);
-  const [previews, setPreviews] = useState([]);
-  const [files, setFiles] = useState([]);
-  const [caption, setCaption] = useState('');
-  const [location, setLocation] = useState('');
-  const [musicFile, setMusicFile] = useState(null);
 
-  const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    setFiles(selectedFiles);
 
-    const filePreviews = selectedFiles.map(file => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-      });
-    });
 
-    Promise.all(filePreviews).then(results => setPreviews(results));
-  };
-
-  const handlePostSubmit = () => {
-    toast.success("Post created (demo only)");
-    setOpen(false);
-    setPreviews([]);
-    setFiles([]);
-    setCaption('');
-    setLocation('');
-    setMusicFile(null);
-  };
 
   const logoutHandle = async () => {
     try {
@@ -171,63 +140,15 @@ const LeftSideBar = () => {
         </motion.div>
       </motion.div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg bg-zinc-950 text-white rounded-2xl p-6 w-[95vw]">
-          <div className="flex justify-between items-center mb-4">
-            <DialogTitle className="text-lg">Create New Post</DialogTitle>
-            <button onClick={() => setOpen(false)} className="text-zinc-400 hover:text-white">
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <DialogDescription className="text-sm text-zinc-400 mb-4">
-            Add your photos, caption, music, and location to share your moment.
-          </DialogDescription>
 
-          <div className="flex flex-col gap-4">
-            <Input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileChange}
-              className="bg-zinc-800 border-none text-white"
-            />
-            {previews.length > 0 && (
-              <div className="grid grid-cols-2 gap-2">
-                {previews.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt={`preview-${i}`}
-                    className="rounded-lg  w-full object-cover"
-                  />
-                ))}
-              </div>
-            )}
-            <Textarea
-              placeholder="Write a caption..."
-              value={caption}
-              onChange={e => setCaption(e.target.value)}
-              className="bg-zinc-800 border-none text-white"
-            />
-            <Input
-              placeholder="Add location"
-              value={location}
-              onChange={e => setLocation(e.target.value)}
-              className="bg-zinc-800 border-none text-white"
-            />
-            <Input
-              type="file"
-              accept="audio/*"
-              onChange={e => setMusicFile(e.target.files[0])}
-              className="bg-zinc-800 border-none text-white"
-            />
-            {musicFile && (
-              <p className="text-sm text-zinc-400">Selected music: {musicFile.name}</p>
-            )}
-            <Button onClick={handlePostSubmit} className="bg-white text-black hover:bg-zinc-300 cursor-pointer">Post</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+
+
+
+      {/* Here's the key part: render the CreatePost dialog */}
+      <CreatePost open={open} setOpen={setOpen} />
+
+
+
     </>
   );
 };
