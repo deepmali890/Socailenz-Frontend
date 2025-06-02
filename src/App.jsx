@@ -10,7 +10,7 @@ import EditProfile from "./components/EditProfile";
 import ArchivePosts from "./components/ArchivePosts";
 import SearchPage from "./components/SearchPage";
 import ExpolorePage from "./components/ExpolorePage";
-
+import PrivateRoute from "./PrivateRoute";
 
 
 const router = createBrowserRouter([
@@ -20,31 +20,59 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: (
+          <PrivateRoute>
+            <Home />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/profile",
-        element: <MyProfile />,
+        element: (
+          <PrivateRoute>
+            <MyProfile />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/notification",
-        element: <Notifications />,
+        element: (
+          <PrivateRoute>
+            <Notifications />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/editprofile",
-        element: <EditProfile />,
+        element: (
+          <PrivateRoute>
+            <EditProfile />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/archive",
-        element: <ArchivePosts />,
+        element: (
+          <PrivateRoute>
+            <ArchivePosts />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/search",
-        element: <SearchPage />,
+        element: (
+          <PrivateRoute>
+            <SearchPage />
+          </PrivateRoute>
+        ),
       },
-       {
+      {
         path: "/expolre",
-        element: <ExpolorePage />,
+        element: (
+          <PrivateRoute>
+            <ExpolorePage />
+          </PrivateRoute>
+        ),
       },
     ],
   },
@@ -56,7 +84,6 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <SignUp />,
   },
-
 ]);
 
 function App() {
