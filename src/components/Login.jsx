@@ -1,5 +1,7 @@
+import { setAuthUser } from '@/redux/slice/auth.slice'
 import axios from 'axios'
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -8,6 +10,8 @@ const Login = () => {
     const [input, setInput] = useState({ username: '', password: '' })
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+
+    const dispatch = useDispatch()
 
 
     const changeEventHandler = (e) => {
@@ -25,6 +29,7 @@ const Login = () => {
                     withCredentials: true,
                 })
             if (res.data.success) {
+                dispatch(setAuthUser(res.data.user))
                 toast.success(res.data.message || "Login successful!");
                 navigate('/');
                 setInput({ username: "", password: "" });

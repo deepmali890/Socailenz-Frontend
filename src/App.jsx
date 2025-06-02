@@ -6,6 +6,10 @@ import MainLayout from "./components/MainLayout";
 import Home from "./components/Home";
 import MyProfile from "./components/MyProfile";
 import Notifications from "./components/Notifications";
+import EditProfile from "./components/EditProfile";
+import ArchivePosts from "./components/ArchivePosts";
+import SearchPage from "./components/SearchPage";
+import ExpolorePage from "./components/ExpolorePage";
 
 
 
@@ -22,9 +26,25 @@ const router = createBrowserRouter([
         path: "/profile",
         element: <MyProfile />,
       },
-       {
+      {
         path: "/notification",
         element: <Notifications />,
+      },
+      {
+        path: "/editprofile",
+        element: <EditProfile />,
+      },
+      {
+        path: "/archive",
+        element: <ArchivePosts />,
+      },
+      {
+        path: "/search",
+        element: <SearchPage />,
+      },
+       {
+        path: "/expolre",
+        element: <ExpolorePage />,
       },
     ],
   },
