@@ -26,7 +26,7 @@ const SignUp = () => {
 
         try {
             setLoading(true)
-            const res = await axios.post('https://socailenz-backend.onrender.com/api/user/register', input, {
+            const res = await axios.post('https://socailenz-backend.onrender.com/api/v1/user/register', input, {
                 headers: {
                     'Content-Type': 'application/json',
                 },

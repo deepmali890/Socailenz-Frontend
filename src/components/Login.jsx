@@ -21,7 +21,7 @@ const Login = () => {
         e.preventDefault();
         setLoading(true)
         try {
-            const res = await axios.post('https://socailenz-backend.onrender.com/api/user/login', input,
+            const res = await axios.post('https://socailenz-backend.onrender.com/api/v1/user/login', input,
                 {
                     headers: {
                         'Content-Type': 'application/json',

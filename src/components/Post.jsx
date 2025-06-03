@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Bookmark,
   Ellipsis,
   Forward,
   Heart,
   MessageCircle,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { Dialog, DialogTrigger } from '@radix-ui/react-dialog';
 import { DialogContent } from './ui/dialog';
@@ -24,21 +26,57 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setPosts } from '../redux/slice/PostSlice';
 
 const Post = ({ post }) => {
-  const [showComments, setShowComments] = useState(false);
-  const [text, setText] = useState('');
-
   const { user } = useSelector((state) => state.auth);
   const allPosts = useSelector((state) => state.posts.posts);
   const dispatch = useDispatch();
+
+
+  const [showComments, setShowComments] = useState(false);
+  const [text, setText] = useState('');
+  const [isMuted, setIsMuted] = useState(true);
+  const audioRef = useRef(null);
+  const [liked,setLiked] = useState(post.likes.includes(user?._id) || false);
+  const [postLike, setPostLike] = useState(post.likes.length);
 
   const changeCommentEventHandler = (e) => {
     setText(e.target.value);
   };
 
+  const likeDisLikeHandler = async()=>{
+    try {
+      const action = liked ? 'dislike' : 'like';
+      const res = await axios.get(`https://socailenz-backend.onrender.com/api/v1/post/${post._id}/${action}`, {
+        withCredentials: true,
+      })
+      if(res.data.success){
+        const updatedLikes = liked ? postLike - 1 : postLike + 1;
+        setPostLike(updatedLikes)
+        setLiked(!liked)
+
+        const updatedPostData = allPosts.map((p) => {
+          if (p._id === post._id) {
+            return {
+              ...p,
+              likes: liked ? p.likes.filter((id) => id !== user?._id) : [...p.likes, user?._id],
+            };
+          }
+          return p;
+        });
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message || "Like SuccessFull!");
+      }
+      
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Like Failed!");
+      
+    }
+  }
+
   const deletePostHandler = async () => {
     try {
       const res = await axios.delete(
-        `https://socailenz-backend.onrender.com/api/post/posts/${post._id}/deletePost`,
+        `https://socailenz-backend.onrender.com/api/v1/post/posts/${post._id}/deletePost`,
         { withCredentials: true }
       );
 
@@ -53,9 +91,66 @@ const Post = ({ post }) => {
     }
   };
 
+  // Listen to global event when any post starts playing
+  useEffect(() => {
+    function handleOtherPostPlay(e) {
+      const playingPostId = e.detail;
+      if (playingPostId !== post._id && audioRef.current) {
+        audioRef.current.muted = true;
+        setIsMuted(true);
+      }
+    }
+
+    window.addEventListener('post-music-play', handleOtherPostPlay);
+
+    return () => {
+      window.removeEventListener('post-music-play', handleOtherPostPlay);
+    };
+  }, [post._id]);
+
+  // Play or mute audio based on isMuted state
+  useEffect(() => {
+    if (audioRef.current && post.music) {
+      audioRef.current.muted = isMuted;
+      audioRef.current
+        .play()
+        .catch((err) => {
+          console.warn('Autoplay blocked:', err.message);
+        });
+    }
+  }, [isMuted, post.music]);
+
+  // Show loading spinner if post data is missing
+  if (!post || !post.images) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <svg
+          className="animate-spin h-10 w-10 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          ></path>
+        </svg>
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="max-w-md mx-auto bg-black text-white font-sans border border-neutral-800 rounded-lg overflow-hidden">
+      <div className="relative max-w-md mx-auto bg-black text-white font-sans border border-neutral-800 rounded-lg overflow-hidden">
         {/* Header */}
         <div className="flex items-center gap-3 px-4 py-3">
           <img
@@ -105,23 +200,57 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {/* Images */}
+        {/* Images + Music */}
         <Carousel className="w-full">
           <CarouselContent>
             {post.images.map((url, i) => (
               <CarouselItem key={i}>
-                <Card>
-                  <CardContent className="flex items-center justify-center p-0">
+                <Card className="relative">
+                  <CardContent className="flex items-center justify-center p-0 relative">
                     <img
                       src={url}
                       alt={`post-${i}`}
                       className="w-full object-cover rounded"
                     />
+
+                    {post.music && i === 0 && (
+                      <>
+                        <audio
+                          ref={audioRef}
+                          src={post.music}
+                          loop
+                          autoPlay
+                          muted={isMuted}
+                        />
+                        <button
+                          onClick={() => {
+                            if (audioRef.current) {
+                              if (audioRef.current.muted) {
+                                audioRef.current.muted = false;
+                                setIsMuted(false);
+                                window.dispatchEvent(
+                                  new CustomEvent('post-music-play', {
+                                    detail: post._id,
+                                  })
+                                );
+                              } else {
+                                audioRef.current.muted = true;
+                                setIsMuted(true);
+                              }
+                            }
+                          }}
+                          className="absolute top-4 right-4 bg-black/60 p-2 rounded-full text-white hover:bg-black/80 z-10"
+                        >
+                          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                        </button>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </CarouselItem>
             ))}
           </CarouselContent>
+
           {post.images.length > 1 && (
             <>
               <CarouselPrevious className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full p-2 shadow cursor-pointer" />
@@ -130,10 +259,10 @@ const Post = ({ post }) => {
           )}
         </Carousel>
 
-        {/* Action Buttons */}
+        {/* Actions */}
         <div className="flex items-center justify-between px-2">
           <div className="flex items-center px-4 py-2 gap-4 text-xl text-white">
-            <Heart className="cursor-pointer" />
+            <Heart className="cursor-pointer"  onClick={likeDisLikeHandler}/>
             <MessageCircle
               className="cursor-pointer"
               onClick={() => setShowComments(true)}
@@ -144,9 +273,7 @@ const Post = ({ post }) => {
         </div>
 
         {/* Likes */}
-        <div className="px-4 text-sm font-medium">
-          {post.likes.length} likes
-        </div>
+        <div className="px-4 text-sm font-medium">{postLike} likes</div>
 
         {/* Caption */}
         <div className="px-4 py-2 text-sm">
@@ -186,13 +313,11 @@ const Post = ({ post }) => {
 
       {/* Comments Modal */}
       {showComments && (
-        <CommentModel
-          onClose={() => setShowComments(false)}
-          comments={post.comments}
-        />
+        <CommentModel onClose={() => setShowComments(false)} comments={post.comments} />
       )}
     </>
   );
 };
+
 
 export default Post;

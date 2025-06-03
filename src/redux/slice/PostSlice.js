@@ -18,7 +18,7 @@ export const { setPosts } = postSlice.actions;
 
 export const fetchPosts = () => async (dispatch) => {
     try {
-        const response = await axios.get('https://socailenz-backend.onrender.com/api/post/AllPost', {
+        const response = await axios.get('https://socailenz-backend.onrender.com/api/v1/post/AllPost', {
             withCredentials: true,
         });
         dispatch(setPosts(response.data.posts));

@@ -59,7 +59,7 @@ const CreatePost = ({ open, setOpen }) => {
         try {
             setLoading(true);
             const res = await axios.post(
-                'https://socailenz-backend.onrender.com/api/post/createPost',
+                'https://socailenz-backend.onrender.com/api/v1/post/createPost',
                 formData,
                 {
                     headers: {

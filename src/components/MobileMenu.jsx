@@ -28,7 +28,7 @@ const MobileMenu = () => {
 
   const logoutHandle = async () => {
     try {
-      const res = await axios.post('https://socailenz-backend.onrender.com/api/user/logout', {}, { withCredentials: true });
+      const res = await axios.post('https://socailenz-backend.onrender.com/api/v1/user/logout', {}, { withCredentials: true });
       if (res.data.success) {
         dispatch(setAuthUser(null))
         toast.success(res.data.message || "Logout SuccessFull!");

@@ -26,7 +26,7 @@ const LeftSideBar = () => {
   const logoutHandle = async () => {
     try {
       const res = await axios.post(
-        'https://socailenz-backend.onrender.com/api/user/logout',
+        'https://socailenz-backend.onrender.com/api/v1/user/logout',
         {},
         { withCredentials: true }
       );
