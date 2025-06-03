@@ -1,26 +1,27 @@
 // src/components/Posts.jsx
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchPosts } from '@/redux/slice/PostSlice';
+import { useSelector } from 'react-redux';
 import Post from './Post';
 
+/**
+ * Posts Component
+ * Responsible for fetching all posts from Redux store and rendering individual Post components.
+ */
 const Posts = () => {
-  const dispatch = useDispatch();
-  const { posts, loading, error } = useSelector((state) => state.post);
-
-  useEffect(() => {
-    dispatch(fetchPosts());
-  }, [dispatch]);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  // Select posts array from Redux state. Uses optional chaining for safety fallback.
+  const allPosts = useSelector((state) => state.posts?.posts || []);
 
   return (
-    <div className="mx-auto">
-      {posts.map((post) => (
-        <Post key={post._id} post={post} />
-      ))}
-    </div>
+    <>
+      {allPosts.length > 0 ? (
+        // Map through allPosts and render each Post component
+        allPosts.map((post) => (
+          <Post key={post._id} post={post} />
+        ))
+      ) : (
+        // Show fallback text when no posts are available
+        <p className="text-center">No posts found.</p>
+      )}
+    </>
   );
 };
 

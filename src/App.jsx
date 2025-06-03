@@ -10,8 +10,7 @@ import EditProfile from "./components/EditProfile";
 import ArchivePosts from "./components/ArchivePosts";
 import SearchPage from "./components/SearchPage";
 import ExpolorePage from "./components/ExpolorePage";
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+
 
 
 

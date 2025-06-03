@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, X } from 'lucide-react';
 import axios from 'axios';
+import { fetchPosts } from '@/redux/slice/PostSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const CreatePost = ({ open, setOpen }) => {
     const [previews, setPreviews] = useState([]);
@@ -17,11 +19,14 @@ const CreatePost = ({ open, setOpen }) => {
     const [musicFile, setMusicFile] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const dispatch = useDispatch();
+    const { user } = useSelector(state => state.auth);
+
+
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
         setFiles(selectedFiles);
 
-        // Generate base64 previews for images
         const filePreviews = selectedFiles.map(file => new Promise(resolve => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result);
@@ -60,11 +65,12 @@ const CreatePost = ({ open, setOpen }) => {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     },
-                    withCredentials: true, // This tells browser: "send cookies with this request"
+                    withCredentials: true,
                 }
             );
             if (res.data.success) {
                 toast.success(res.data.message || "Post created successfully!");
+
                 // Reset form
                 setCaption('');
                 setLocation('');
@@ -72,6 +78,8 @@ const CreatePost = ({ open, setOpen }) => {
                 setPreviews([]);
                 setMusicFile(null);
                 setOpen(false);
+
+                dispatch(fetchPosts());
             } else {
                 toast.error("Failed to create post");
             }
@@ -92,6 +100,18 @@ const CreatePost = ({ open, setOpen }) => {
                         <X className="h-5 w-5" />
                     </button>
                 </div>
+
+                {user && (
+                    <div className="flex items-center gap-3 mb-4">
+                        <img
+                            src={user?.profilePicture || '/default-avatar.png'}
+                            alt="Profile"
+                            className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-sm font-medium text-white">{user.username}</span>
+                    </div>
+                )}
+
                 <DialogDescription className="text-sm text-zinc-400 mb-4">
                     Add your photos, caption, music, and location to share your moment.
                 </DialogDescription>
@@ -106,7 +126,7 @@ const CreatePost = ({ open, setOpen }) => {
                         className="bg-zinc-800 border-none text-white"
                     />
                     {previews.length > 0 && (
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2  overflow-y-auto pr-1 custom-scrollbar">
                             {previews.map((src, i) => (
                                 <img
                                     key={i}
@@ -120,14 +140,12 @@ const CreatePost = ({ open, setOpen }) => {
                     <Textarea
                         placeholder="Write a caption..."
                         value={caption}
-                        name="caption"
                         onChange={e => setCaption(e.target.value)}
                         className="bg-zinc-800 border-none text-white"
                     />
                     <Input
                         placeholder="Add location"
                         value={location}
-                        name="location"
                         onChange={e => setLocation(e.target.value)}
                         className="bg-zinc-800 border-none text-white"
                     />
